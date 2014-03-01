@@ -30,8 +30,6 @@ from horizons.gui.util import load_uh_widget
 from horizons.gui.widgets.imagebutton import OkButton, CancelButton
 from horizons.util.python.callback import Callback
 
-from horizons.command.game import PauseCommand, UnPauseCommand
-
 
 class Window(object):
 
@@ -41,6 +39,11 @@ class Window(object):
 		self._windows = windows
 
 		self._modal_background = None
+
+	def open(self, **kwargs):
+		"""Opens the window.
+		"""
+		self.show()
 
 	def show(self, **kwargs):
 		"""Show the window.
@@ -286,13 +289,10 @@ class Popup(Dialog):
 
 class WindowManager(object):
 
-	def __init__(self, session=None):
+	def __init__(self):
 		self._windows = []
-		# game session variable. When set, the session is paused
-		# when any window is opened. When None, nothing happens.
-		self._session = session
 
-	def show(self, window, **kwargs):
+	def show(self, window, _open=False, **kwargs):
 		"""Show a new window on top.
 
 		Hide the current one and show the new one.
@@ -301,11 +301,11 @@ class WindowManager(object):
 		if self._windows:
 			self._windows[-1].hide()
 
-		if self._session:
-			PauseCommand().execute(self._session)
-
 		self._windows.append(window)
-		return window.show(**kwargs)
+		if _open:
+			return window.open(**kwargs)
+		else:
+			return window.show(**kwargs)
 
 	def close(self):
 		"""Close the top window.
@@ -317,17 +317,16 @@ class WindowManager(object):
 		if self._windows:
 			self._windows[-1].show()
 
-		if self._session:
-			UnPauseCommand().execute(self._session)
-
 	def toggle(self, window, **kwargs):
 		"""Hide window if is currently visible (and on top), show it otherwise."""
 		if self._windows and self._windows[-1] == window:
 			self.close()
 		else:
+			_open = True
 			if window in self._windows:
 				self._windows.remove(window)
-			self.show(window, **kwargs)
+				_open = False
+			self.show(window, _open=_open, **kwargs)
 
 	def on_escape(self):
 		"""Let the topmost window handle an escape key event."""

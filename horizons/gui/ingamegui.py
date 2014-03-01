@@ -78,7 +78,7 @@ class IngameGui(LivingObject):
 		self.message_widget = MessageWidget(self.session)
 
 		# Windows
-		self.windows = WindowManager(self.session)
+		self.windows = WindowManager()
 		self.show_popup = self.windows.show_popup
 		self.show_error_popup = self.windows.show_error_popup
 
