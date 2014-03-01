@@ -20,7 +20,6 @@
 # ###################################################
 
 import horizons.main
-from horizons.command.game import PauseCommand, UnPauseCommand
 from horizons.gui.modules.editorstartmenu import EditorStartMenu
 from horizons.gui.modules.settings import SettingsDialog
 from horizons.gui.modules.select_savegame import SelectSavegameDialog
@@ -71,12 +70,10 @@ class PauseMenu(Window):
 		})
 
 	def show(self):
-		PauseCommand(suggestion=True).execute(self._session)
 		self._gui.show()
 
 	def hide(self):
 		self._gui.hide()
-		UnPauseCommand(suggestion=True).execute(self._session)
 
 	def _do_quit(self):
 		message = _("Are you sure you want to abort the running session?")

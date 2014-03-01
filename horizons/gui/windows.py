@@ -30,6 +30,8 @@ from horizons.gui.util import load_uh_widget
 from horizons.gui.widgets.imagebutton import OkButton, CancelButton
 from horizons.util.python.callback import Callback
 
+from horizons.command.game import PauseCommand, UnPauseCommand
+
 
 class Window(object):
 
@@ -284,8 +286,11 @@ class Popup(Dialog):
 
 class WindowManager(object):
 
-	def __init__(self):
+	def __init__(self, session=None):
 		self._windows = []
+		# game session variable. When set, the session is paused
+		# when any window is opened. When None, nothing happens.
+		self._session = session
 
 	def show(self, window, **kwargs):
 		"""Show a new window on top.
@@ -295,6 +300,9 @@ class WindowManager(object):
 		"""
 		if self._windows:
 			self._windows[-1].hide()
+
+		if self._session:
+			PauseCommand().execute(self._session)
 
 		self._windows.append(window)
 		return window.show(**kwargs)
@@ -308,6 +316,9 @@ class WindowManager(object):
 		window.close()
 		if self._windows:
 			self._windows[-1].show()
+
+		if self._session:
+			UnPauseCommand().execute(self._session)
 
 	def toggle(self, window, **kwargs):
 		"""Hide window if is currently visible (and on top), show it otherwise."""
